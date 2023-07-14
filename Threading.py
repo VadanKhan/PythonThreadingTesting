@@ -19,8 +19,7 @@ def worker(data, start, end, spread):
     return avg_vals
 
 
-def moving_average_parallel(data, spread):
-    n_workers = 4
+def moving_average_parallel(data, spread, n_workers):
     chunk_size = len(data) // n_workers
     with ProcessPoolExecutor() as executor:
         results = executor.map(
@@ -34,16 +33,14 @@ def moving_average_parallel(data, spread):
 
 
 if __name__ == "__main__":
-    data = np.random.rand(50000000)
+    data = np.random.rand(30000000)
     spread = 1000
-    print("_" * 60, "Begin Averaging", "_" * 60)
-    result = moving_average_parallel(data, spread)
-    print("=" * 60, "Averaging Finished", "=" * 60)
-
     pr = cProfile.Profile()
+    print("_" * 60, "Begin Averaging", "_" * 60)
     pr.enable()
-    moving_average_parallel(data, spread)
+    result = moving_average_parallel(data, spread, 4)
     pr.disable()
+    print("=" * 60, "Averaging Finished", "=" * 60)
 
     s = StringIO()
     ps = pstats.Stats(pr, stream=s).sort_stats("tottime")
